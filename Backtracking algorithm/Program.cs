@@ -16,15 +16,9 @@ namespace Backtracking_algorithm {
                 new List<int>{0, 0, 5, 2, 0, 6, 3, 0, 0 }
             };
             Sudoku sudoku = new Sudoku(board);
-            if(sudoku.changeField(4, 8, 0)) {
-                sudoku.printInitialBoard();
-                Console.WriteLine("\n");
-                Console.WriteLine("\n");
-                Console.WriteLine("\n");
-                sudoku.printPlayingBoard();
-            } else {
-                Console.WriteLine("NOT OK");
-            }
+            SudokuSolver.solve(sudoku);
+
+            sudoku.printPlayingBoard();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Backtracking_algorithm {
     class Sudoku {
-        private static readonly int NUM_ROWS = 9, NUM_COLS = 9;
+        public static readonly int NUM_ROWS = 9, NUM_COLS = 9;
 
         private List<List<int>> initialBoard = new List<List<int>>();
         private List<List<int>> quadrants = new List<List<int>>();
@@ -14,10 +14,10 @@ namespace Backtracking_algorithm {
         private bool checkBoard(List<List<int>> b) {
             if (b.Count != 9)
                 return false;
-            for(int i = 0; i < b.Count; i++) {
+            for (int i = 0; i < b.Count; i++) {
                 if (b[i].Count != 9)
                     return false;
-                for(int j = 0; j < b[i].Count; j++) {
+                for (int j = 0; j < b[i].Count; j++) {
                     if (b[i][j] < 0 || b[i][j] > 9)
                         return false;
                 }
@@ -37,14 +37,14 @@ namespace Backtracking_algorithm {
         private void setQuadrants(List<List<int>> board) {
             quadrants = board.ConvertAll(list => new List<int>(list));
             int qNum = 0, col = -3;
-            for(int i = 0; i < 9; i++) {
+            for (int i = 0; i < 9; i++) {
                 col += 3;
                 if (i != 0 && i % 3 == 0) {
                     qNum += 3;
                     col = 0;
                 }
-                    
-                for(int j = 0; j < 9; j++) {
+
+                for (int j = 0; j < 9; j++) {
                     if (j != 0 && j % 3 == 0)
                         qNum++;
                     else if (qNum != 0 && j == 0)
@@ -57,7 +57,7 @@ namespace Backtracking_algorithm {
             }
         }
 
-        private bool checkQuadrant(int num, int row, int col) {
+        private int getQuadrant(int row, int col) {
             int qNum = 0;
             if (col >= 3 && col <= 5)
                 qNum = 1;
@@ -69,11 +69,26 @@ namespace Backtracking_algorithm {
             else if (row >= 6 && row <= 8)
                 qNum += 2;
 
-            for(int j = 0; j < 9; j++) {
+            return qNum;
+        }
+        private bool checkQuadrant(int num, int row, int col) {
+            int qNum = getQuadrant(row, col);
+
+            for (int j = 0; j < 9; j++) {
                 if (quadrants[qNum][j] == num)
                     return false;
             }
             return true;
+        }
+
+        private void addToQuadrant(int num, int row, int col) {
+            int qNum = getQuadrant(row, col);
+            for(int j = 0; j < quadrants[qNum].Count; j++) {
+                if(quadrants[qNum][j] == playingBoard[row][col]) {
+                    quadrants[qNum][j] = num;
+                    return;
+                }
+            }
         }
 
         public void printInitialBoard() {
@@ -87,11 +102,15 @@ namespace Backtracking_algorithm {
 
         public void printPlayingBoard() {
             for (int i = 0; i < NUM_ROWS; i++) {
-                for(int j = 0; j < NUM_COLS; j++) {
+                for (int j = 0; j < NUM_COLS; j++) {
                     Console.Write(playingBoard[i][j] + " ");
                 }
                 Console.WriteLine();
             }
+        }
+
+        public int get(int row, int col){
+            return playingBoard[row][col];  
         }
 
         public Sudoku(List<List<int>> board) {
@@ -135,6 +154,7 @@ namespace Backtracking_algorithm {
             if (!checkQuadrant(num, row, col))
                 return false;
 
+            addToQuadrant(num, row, col);
             playingBoard[row][col] = num;
             return true;
         }
