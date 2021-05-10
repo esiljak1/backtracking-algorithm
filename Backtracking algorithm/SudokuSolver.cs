@@ -14,13 +14,17 @@ namespace Backtracking_algorithm {
                     }
                 }
             }
+
+            Console.WriteLine("Solved!");
         }
 
         private static bool checkSolution(Sudoku sudoku, int row, int col) {
             for(int num = 1; num <= 9; num++) {
-                if (sudoku.changeField(num, row, col))
+                if (!sudoku.IsSolved && sudoku.changeField(num, row, col))
                     solve(sudoku);
             }
+            if(!sudoku.IsSolved)
+                sudoku.changeField(0, row, col);
 
             return false;
         }

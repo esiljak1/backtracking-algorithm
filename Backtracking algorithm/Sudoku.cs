@@ -10,6 +10,9 @@ namespace Backtracking_algorithm {
         private List<List<int>> quadrants = new List<List<int>>();
 
         private List<List<int>> playingBoard = new List<List<int>>();
+        private bool isSolved = false;
+
+        public bool IsSolved { get => isSolved;}
 
         private bool checkBoard(List<List<int>> b) {
             if (b.Count != 9)
@@ -64,10 +67,10 @@ namespace Backtracking_algorithm {
             else if (col >= 6 && col <= 8)
                 qNum = 2;
 
-            if (row >= 3 && row >= 5)
-                qNum++;
+            if (row >= 3 && row <= 5)
+                qNum+=3;
             else if (row >= 6 && row <= 8)
-                qNum += 2;
+                qNum += 6;
 
             return qNum;
         }
@@ -91,6 +94,16 @@ namespace Backtracking_algorithm {
             }
         }
 
+        private void checkIfSolved() {
+            foreach(var l in playingBoard) {
+                if (l.Contains(0)) {
+                    isSolved = false;
+                    return;
+                }
+            }
+            isSolved = true;
+        }
+
         public void printInitialBoard() {
             for (int i = 0; i < NUM_ROWS; i++) {
                 for (int j = 0; j < NUM_COLS; j++) {
@@ -104,6 +117,12 @@ namespace Backtracking_algorithm {
             for (int i = 0; i < NUM_ROWS; i++) {
                 for (int j = 0; j < NUM_COLS; j++) {
                     Console.Write(playingBoard[i][j] + " ");
+                    if (j % 3 == 2 && j != NUM_COLS - 1)
+                        Console.Write("| ");
+                }
+                if(i % 3 == 2 && i != NUM_ROWS - 1) {
+                    Console.WriteLine();
+                    Console.Write("----------------------");
                 }
                 Console.WriteLine();
             }
@@ -124,15 +143,6 @@ namespace Backtracking_algorithm {
             setQuadrants(board);
         }
 
-        private void printQuadrants() {
-            for(int i = 0; i < quadrants.Count; i++) {
-                for(int j = 0; j < NUM_ROWS; j++) {
-                    Console.WriteLine(quadrants[i][j] + " ");
-                }
-                Console.WriteLine("\n");
-            }
-        }
-
         public bool changeField(int num, int row, int col) {
             if (num < 0 || num > 9 || row < 0 || row > 8 || col < 0 || col > 8)
                 throw new ArgumentException("Number or row or column is not within the range");
@@ -140,6 +150,7 @@ namespace Backtracking_algorithm {
             if (initialBoard[row][col] != 0)
                 throw new ArithmeticException("You cannot change this cell");
             if(num == 0) {
+                addToQuadrant(num, row, col);
                 playingBoard[row][col] = num;
                 return true;
             }
@@ -156,6 +167,7 @@ namespace Backtracking_algorithm {
 
             addToQuadrant(num, row, col);
             playingBoard[row][col] = num;
+            checkIfSolved();
             return true;
         }
     }
