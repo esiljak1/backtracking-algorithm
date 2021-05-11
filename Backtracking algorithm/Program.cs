@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Backtracking_algorithm {
     class Program {
         static void Main(string[] args) {
-            List<List<int>> board = new List<List<int>> {
+            /*List<List<int>> board = new List<List<int>> {
                 new List<int>{3, 0, 6, 5, 0, 8, 4, 0, 0 },
                 new List<int>{5, 6, 0, 0, 0, 0, 0, 0, 0 },
                 new List<int>{0, 8, 7, 0, 0, 0, 0, 3, 1 },
@@ -18,7 +18,30 @@ namespace Backtracking_algorithm {
             Sudoku sudoku = new Sudoku(board);
             SudokuSolver.solve(sudoku);
 
-            sudoku.printPlayingBoard();
+            sudoku.printPlayingBoard();*/
+
+            List<List<int>> board = new List<List<int>>();
+            Console.WriteLine("Please enter the numbers for initial sudoku board (0 for empty cell): \n");
+            for (int i = 0; i < 9; i++) {
+                board.Add(new List<int>());
+                Console.WriteLine("Row " + i + ":");
+                for (int j = 0; j < 9; j++) {
+                    int num = int.Parse(Console.ReadLine());
+                    board[i].Add(num);
+                }
+                Console.WriteLine();
+            }
+            try {
+                Sudoku sudoku = new Sudoku(board);
+                SudokuSolver.solve(sudoku);
+
+                if (sudoku.IsSolved) {
+                    Console.WriteLine();
+                    sudoku.printPlayingBoard();
+                }
+            }catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }
