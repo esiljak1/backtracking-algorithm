@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Backtracking_algorithm {
+    //TODO dodati provjeru za pocetnu tablu, da li je validna
+    //tj. da li postoje neka podudaranja unutar redova/kolona/kvadranata
     class Sudoku {
         public static readonly int NUM_ROWS = 9, NUM_COLS = 9;
 
@@ -13,6 +16,29 @@ namespace Backtracking_algorithm {
         private bool isSolved = false;
 
         public bool IsSolved { get => isSolved;}
+
+        private static bool checkRowsAndCols(List<List<int>> board, int row, int col) {
+            int num = board[row][col];
+            for(int j = 0; j < NUM_COLS; j++) {
+                if (j != col && board[row][j] == num)
+                    return false;
+                if (j != row && board[j][col] == num)
+                    return false;
+            }
+            return true;
+        }
+
+        private bool checkBoardState(List<List<int>> b) {
+            for(int i = 0; i < NUM_ROWS; i++) {
+                for(int j = 0; j < NUM_COLS; j++) {
+                    if(b[i][j] != 0) {
+                        if (!checkRowsAndCols(b, i, j))
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         private bool checkBoard(List<List<int>> b) {
             if (b.Count != 9)
@@ -58,6 +84,7 @@ namespace Backtracking_algorithm {
                         col -= 3;
                 }
             }
+            quadrantValidation();
         }
 
         private int getQuadrant(int row, int col) {
@@ -68,11 +95,30 @@ namespace Backtracking_algorithm {
                 qNum = 2;
 
             if (row >= 3 && row <= 5)
-                qNum+=3;
+                qNum += 3;
             else if (row >= 6 && row <= 8)
                 qNum += 6;
 
             return qNum;
+        }
+
+        private bool checkQuadrant(int num, int qNum) {
+            if (num == 0)
+                return true;
+            return quadrants[qNum].Where(x => x == num).ToList().Count <= 1;
+        }
+        private void quadrantValidation() {
+            int qNum = 0;
+            foreach(var l in quadrants) {
+                foreach(int num in l) {
+                    if(!checkQuadrant(num, qNum)) {
+                        quadrants.Clear();
+                        throw new ArgumentException("No number can repeat itself in the same quadrant (except for 0)");
+                    }
+                        
+                }
+                qNum++;
+            }
         }
         private bool checkQuadrant(int num, int row, int col) {
             int qNum = getQuadrant(row, col);
@@ -104,28 +150,27 @@ namespace Backtracking_algorithm {
             isSolved = true;
         }
 
-        public void printInitialBoard() {
+        private void print(List<List<int>> b) {
             for (int i = 0; i < NUM_ROWS; i++) {
                 for (int j = 0; j < NUM_COLS; j++) {
-                    Console.Write(initialBoard[i][j] + " ");
-                }
-                Console.WriteLine();
-            }
-        }
-
-        public void printPlayingBoard() {
-            for (int i = 0; i < NUM_ROWS; i++) {
-                for (int j = 0; j < NUM_COLS; j++) {
-                    Console.Write(playingBoard[i][j] + " ");
+                    Console.Write(b[i][j] + " ");
                     if (j % 3 == 2 && j != NUM_COLS - 1)
                         Console.Write("| ");
                 }
-                if(i % 3 == 2 && i != NUM_ROWS - 1) {
+                if (i % 3 == 2 && i != NUM_ROWS - 1) {
                     Console.WriteLine();
                     Console.Write("----------------------");
                 }
                 Console.WriteLine();
             }
+        }
+
+        public void printInitialBoard() {
+            print(initialBoard);
+        }
+
+        public void printPlayingBoard() {
+            print(playingBoard);
         }
 
         public int get(int row, int col){
@@ -137,10 +182,14 @@ namespace Backtracking_algorithm {
                 throw new ArgumentException("Board must be 9x9 and use only numbers between 0 and 9, where 0 represents blank space");
             }
 
-            initialBoard = board.ConvertAll(list => new List<int>(list));
-            playingBoard = board.ConvertAll(list => new List<int>(list));
+            if (!checkBoardState(board)) {
+                throw new ArgumentException("No number can be repeated in the same row and/or column except for 0");
+            }
 
             setQuadrants(board);
+
+            initialBoard = board.ConvertAll(list => new List<int>(list));
+            playingBoard = board.ConvertAll(list => new List<int>(list));
         }
 
         public bool changeField(int num, int row, int col) {

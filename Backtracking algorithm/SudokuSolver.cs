@@ -15,7 +15,10 @@ namespace Backtracking_algorithm {
                 }
             }
 
-            Console.WriteLine("Solved!");
+            if (sudoku.IsSolved)
+                Console.WriteLine("Solved!");
+            else
+                Console.WriteLine("Cannot be solved!");
         }
 
         private static bool checkSolution(Sudoku sudoku, int row, int col) {
