@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 
 namespace Backtracking_algorithm {
-    //TODO dodati provjeru za pocetnu tablu, da li je validna
-    //tj. da li postoje neka podudaranja unutar redova/kolona/kvadranata
     class Sudoku {
         public static readonly int NUM_ROWS = 9, NUM_COLS = 9;
 
@@ -121,13 +119,11 @@ namespace Backtracking_algorithm {
             }
         }
         private bool checkQuadrant(int num, int row, int col) {
+            if (num == 0)
+                return true;
             int qNum = getQuadrant(row, col);
 
-            for (int j = 0; j < 9; j++) {
-                if (quadrants[qNum][j] == num)
-                    return false;
-            }
-            return true;
+            return !quadrants[qNum].Any(x => x == num);
         }
 
         private void addToQuadrant(int num, int row, int col) {
